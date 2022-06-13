@@ -1,7 +1,7 @@
 import React, { useContext } from "react";
-import { Avatar, Button, Flex, Heading, Tooltip } from "@chakra-ui/react";
-import { AddIcon } from "@chakra-ui/icons";
+import { Avatar, Flex, Heading, Tooltip } from "@chakra-ui/react";
 import AccountContext from "context/account";
+import CreateProjectButton from "./CreateProjectDialog";
 
 function Header() {
   const accountCtx = useContext(AccountContext);
@@ -40,15 +40,7 @@ function Header() {
         </Flex>
 
         <Flex alignItems={"center"}>
-          <Button
-            leftIcon={<AddIcon />}
-            variant={"outline"}
-            color="teal.500"
-            className="mr-4"
-            fontSize={"sm"}
-          >
-            Create Project
-          </Button>
+          <CreateProjectButton />
           <Tooltip hasArrow label={label}>
             <Avatar src="https://bit.ly/dan-abramov" />
           </Tooltip>
