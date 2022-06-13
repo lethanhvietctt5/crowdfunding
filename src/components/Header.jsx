@@ -1,6 +1,6 @@
 import React from "react";
-import { Avatar, Button, Flex, Heading, Tooltip } from "@chakra-ui/react";
-import { AddIcon } from "@chakra-ui/icons";
+import { Avatar, Flex, Heading, Tooltip } from "@chakra-ui/react";
+import CreateProjectButton from "./CreateProjectDialog";
 
 function Header() {
   return (
@@ -36,15 +36,7 @@ function Header() {
         </Flex>
 
         <Flex alignItems={"center"}>
-          <Button
-            leftIcon={<AddIcon />}
-            variant={"outline"}
-            color="teal.500"
-            className="mr-4"
-            fontSize={"sm"}
-          >
-            Create Project
-          </Button>
+          <CreateProjectButton />
           <Tooltip hasArrow label="0x0asiojash1398928390">
             <Avatar src="https://bit.ly/dan-abramov" />
           </Tooltip>
