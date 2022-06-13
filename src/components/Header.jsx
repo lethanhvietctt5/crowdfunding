@@ -1,8 +1,12 @@
-import React from "react";
+import React, { useContext } from "react";
 import { Avatar, Button, Flex, Heading, Tooltip } from "@chakra-ui/react";
 import { AddIcon } from "@chakra-ui/icons";
+import AccountContext from "context/account";
 
 function Header() {
+  const accountCtx = useContext(AccountContext);
+  let label = accountCtx.account ? accountCtx.account : "Connect Wallet";
+
   return (
     <div className="w-full py-2 shadow-lg">
       <Flex
@@ -45,7 +49,7 @@ function Header() {
           >
             Create Project
           </Button>
-          <Tooltip hasArrow label="0x0asiojash1398928390">
+          <Tooltip hasArrow label={label}>
             <Avatar src="https://bit.ly/dan-abramov" />
           </Tooltip>
         </Flex>
