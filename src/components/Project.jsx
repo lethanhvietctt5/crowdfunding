@@ -90,11 +90,11 @@ function Project() {
 
         const out = await projectContract(addr).methods.info().call();
 
-        out.investedAmount = await projectContract(addr).methods.getCurrentAmountRaised().call();
-
         out.donators = await projectContract(addr).methods.getInvestors().call();
 
         out.donatorsAddr = await projectContract(addr).methods.getInvestorsAddress().call();
+
+        console.log(projectContract(addr).methods);
 
         const rs = {
           name: out["0"],
@@ -103,7 +103,7 @@ function Project() {
           min: out["3"] / 1e18,
           target: out["4"] / 1e18,
           deadline: out["5"],
-          investedAmount: out.investedAmount / 1e18,
+          investedAmount: out["6"] / 1e18,
           donators: out.donators,
           donatorsAddr: out.donatorsAddr,
         };
