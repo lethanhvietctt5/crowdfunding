@@ -54,7 +54,7 @@ function CreateProjectButton() {
     // console.log(values);
     // console.log(new Date(values.deadline).getTime());
     if (account) {
-      const contract = managerContract(account);
+      const contract = managerContract();
       try {
         contract.methods
           .createProject(
@@ -68,6 +68,7 @@ function CreateProjectButton() {
           .send({ from: account }, (err, data) => {
             if (err) console.log(err);
             console.log(data);
+            onClose();
           });
       } catch (e) {
         console.log(e);

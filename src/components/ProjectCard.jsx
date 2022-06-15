@@ -2,17 +2,17 @@ import { TimeIcon } from "@chakra-ui/icons";
 import { Avatar, Box, Flex, Image, Progress, Text, Stack, HStack, Spacer } from "@chakra-ui/react";
 import { MdiHeart } from "./commons/icons/MdiHeart";
 
-function CampaignCard({
+function ProjectCard({
   byWho = "",
   title = "None title",
   desc = "None description",
   currentAt = 0,
-  final = 0,
+  target = 0,
   daysLeft = 0,
   donators = 0,
 }) {
   return (
-    <Box borderRadius="lg" className="shadow-lg" maxWidth="md">
+    <Box borderRadius="lg" className="border border-gray-100 shadow-lg" maxWidth="xs">
       <div className="header-thumbnail">
         <Image borderTopRadius="lg" height="200px" width={"full"} src="https://bit.ly/dan-abramov" alt="Dan Abramov" />
       </div>
@@ -32,9 +32,9 @@ function CampaignCard({
 
         <Stack>
           <div>
-            <span className="font-bold">{currentAt}</span> raised out of <span className="font-bold">{final}</span>
+            <span className="font-bold">{currentAt}</span> raised out of <span className="font-bold">{target}</span>
           </div>
-          <Progress hasStripe value={final && Math.floor(currentAt / final)} />
+          <Progress hasStripe value={target && Math.floor((currentAt / target) * 100)} />
         </Stack>
 
         <Flex>
@@ -53,4 +53,4 @@ function CampaignCard({
   );
 }
 
-export default CampaignCard;
+export default ProjectCard;

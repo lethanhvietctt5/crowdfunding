@@ -1,8 +1,25 @@
 import { ArrowForwardIcon } from "@chakra-ui/icons";
 import { Button, Flex } from "@chakra-ui/react";
-import React from "react";
+import React, { useState, useEffect } from "react";
+import managerContract from "utils/managerContract";
+import ListProjects from "./ListProjects";
 
 function Banner() {
+  const [newProjects, setNewProjects] = useState([]);
+
+  useEffect(() => {
+    managerContract()
+      .methods.getProjects()
+      .call({}, (err, data) => {
+        if (err) console.log(err);
+        console.log(data);
+        setNewProjects(data);
+      });
+    return () => {
+      setNewProjects([]);
+    };
+  }, []);
+
   return (
     <div className="flex justify-center w-2/3 mx-auto mt-28">
       <div>
@@ -21,6 +38,10 @@ function Banner() {
             All projects
           </Button>
         </Flex>
+
+        <div className="w-10/12 py-12 mx-auto overflow-x-scroll">
+          <ListProjects newProjects={newProjects} />
+        </div>
       </div>
     </div>
   );

@@ -24,4 +24,8 @@ contract Manager {
 
         projects.push(address(newProject));
     }
+
+    function getProjects() external view returns(address[] memory) {
+        return projects;
+    }
 }

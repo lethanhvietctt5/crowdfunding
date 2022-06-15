@@ -53,4 +53,8 @@ contract Project {
     {
         return (name, description, owner, minAmout, targetAmount, finishTime);
     }
+
+    function getInvestors() external view returns (uint256) {
+        return investorsAddress.length;
+    }
 }
