@@ -57,4 +57,12 @@ contract Project {
     function getInvestors() external view returns (uint256) {
         return investorsAddress.length;
     }
+
+    function getCurrentAmountRaised() external view returns (uint256) {
+        uint256 rs = 0;
+        for (uint256 i = 0; i < investorsAddress.length; i++) {
+            rs += investorsAmount[investorsAddress[i]];
+        }
+        return rs;
+    }
 }

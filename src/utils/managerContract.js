@@ -4,6 +4,6 @@ import Manager from "contracts/Manager.json";
 export default function managerContract() {
   return new web3.eth.Contract(
     Manager.abi,
-    "0x5F7BD6F14BA71DbD227Ab674E5ecFbea15381491"
+    "0x14282102D66Fe030211B76668a880eFf7841A7a8"
   );
 }

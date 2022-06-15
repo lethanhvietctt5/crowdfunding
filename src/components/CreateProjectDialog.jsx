@@ -69,14 +69,17 @@ function CreateProjectButton() {
           )
           .send({ from: account }, (err, data) => {
             if (err) console.log(err);
+
             console.log(data);
-            onClose();
-            toast({
-              title: "Created project successfully!",
-              status: "success",
-              duration: 1500,
-              isClosable: true,
-            });
+            if (data) {
+              onClose();
+              toast({
+                title: "Created project successfully!",
+                status: "success",
+                duration: 1500,
+                isClosable: true,
+              });
+            }
           });
       } catch (e) {
         console.log(e);

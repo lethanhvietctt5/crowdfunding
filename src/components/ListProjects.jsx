@@ -14,7 +14,7 @@ const ListProjects = ({ newProjects = [] }) => {
           try {
             const out = await projectContract(addr).methods.info().call();
 
-            out.investedAmount = await projectContract(addr).methods.investorsAmount(addr).call();
+            out.investedAmount = await projectContract(addr).methods.getCurrentAmountRaised().call();
 
             out.donators = await projectContract(addr).methods.getInvestors().call();
             out.address = addr;
@@ -34,7 +34,7 @@ const ListProjects = ({ newProjects = [] }) => {
         min: x["3"],
         target: x["4"],
         deadline: x["5"],
-        investedAmount: x.investedAmount,
+        investedAmount: x.investedAmount / 1e18,
         donators: x.donators,
         address: x.address,
       }));
