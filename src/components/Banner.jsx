@@ -1,11 +1,12 @@
 import { ArrowForwardIcon } from "@chakra-ui/icons";
-import { Button, Flex } from "@chakra-ui/react";
+import { Button, Flex, Spinner } from "@chakra-ui/react";
 import React, { useState, useEffect } from "react";
 import managerContract from "utils/managerContract";
 import ListProjects from "./ListProjects";
 
 function Banner() {
   const [newProjects, setNewProjects] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     managerContract()
@@ -14,6 +15,7 @@ function Banner() {
         if (err) console.log(err);
         console.log(data);
         setNewProjects(data);
+        setLoading(false);
       });
     return () => {
       setNewProjects([]);
@@ -39,8 +41,8 @@ function Banner() {
           </Button>
         </Flex>
 
-        <div className="w-2/3 py-12 mx-auto overflow-x-auto">
-          <ListProjects newProjects={newProjects} />
+        <div className="flex justify-center w-2/3 py-12 mx-auto overflow-x-auto">
+          {loading ? <Spinner size="lg" /> : <ListProjects newProjects={newProjects} />}
         </div>
       </div>
     </div>

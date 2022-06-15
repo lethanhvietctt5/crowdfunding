@@ -29,6 +29,7 @@ import { useForm } from "react-hook-form";
 import "react-datepicker/dist/react-datepicker.css";
 import AccountContext from "context/account";
 import managerContract from "utils/managerContract";
+import Web3 from "web3";
 
 function CreateProjectButton() {
   const { isOpen, onClose, onOpen } = useDisclosure();
@@ -63,8 +64,8 @@ function CreateProjectButton() {
             values.name,
             values.description,
             account,
-            values.min,
-            values.target,
+            Web3.utils.toWei(values.min.toString(), "ether"),
+            Web3.utils.toWei(values.target.toString(), "ether"),
             new Date(values.deadline).getTime()
           )
           .send({ from: account }, (err, data) => {

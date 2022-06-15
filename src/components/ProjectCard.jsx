@@ -19,8 +19,7 @@ function ProjectCard({
 
   return (
     <Box
-      borderRadius="lg"
-      className={`border border-gray-100 shadow-lg${navigable && " cursor-pointer"}`}
+      className={`border border-gray-200 rounded shadow-lg${navigable && " cursor-pointer"}`}
       onClick={() => navigable && navigator(`px/${address}`)}
       maxWidth="xs">
       {haveBnx && (
@@ -48,7 +47,9 @@ function ProjectCard({
             <Text noOfLines={"1"} fontSize="lg" fontWeight="bold">
               {title}
             </Text>
-            <Text noOfLines={"2"}>{desc}</Text>
+            <Text noOfLines={"2"} height="12">
+              {desc}
+            </Text>
           </Stack>
         )}
 
@@ -56,7 +57,11 @@ function ProjectCard({
           <div>
             <span className="font-bold">{currentAt}</span> raised out of <span className="font-bold">{target}</span>
           </div>
-          <Progress hasStripe value={target && Math.floor((currentAt / target) * 100)} />
+          <Progress
+            hasStripe
+            colorScheme={target && Math.floor((currentAt / target) * 100) >= 100 ? "orange" : "teal"}
+            value={target && Math.floor((currentAt / target) * 100)}
+          />
         </Stack>
 
         <Flex>

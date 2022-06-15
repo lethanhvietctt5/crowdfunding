@@ -29,7 +29,7 @@ contract Project {
     }
 
     function contribute() public payable {
-        require(msg.value >= minAmout);
+        require(msg.value >= minAmout, "Insufficient amount");
 
         if (investorsAmount[msg.sender] == 0) {
             investorsAddress.push(msg.sender);
@@ -64,5 +64,9 @@ contract Project {
             rs += investorsAmount[investorsAddress[i]];
         }
         return rs;
+    }
+
+    function getInvestorsAddress() external view returns (address[] memory) {
+        return investorsAddress;
     }
 }

@@ -1,7 +1,9 @@
 import {
+  Avatar,
   Button,
   FormControl,
   FormLabel,
+  HStack,
   Input,
   Modal,
   ModalBody,
@@ -11,12 +13,14 @@ import {
   ModalHeader,
   ModalOverlay,
   Spinner,
+  Stack,
   Tab,
   TabList,
   TabPanel,
   TabPanels,
   Tabs,
   Text,
+  Tooltip,
   useDisclosure,
   useToast,
 } from "@chakra-ui/react";
@@ -45,19 +49,38 @@ function Project() {
   const initialRef = useRef(null);
 
   const handleContribute = () => {
-    try {
-      if (account)
-        projectContract(addr)
-          .methods.contribute()
-          .send({ from: account, value: web3.utils.toWei(token.toString(), "ether") }, (err, pl) => {
-            if (err) console.log(err);
-            console.log(pl);
-            onClose();
-          });
-    } catch (e) {
-      console.log(e);
-      onClose();
+    if (token < data.min) {
+      toast({
+        status: "error",
+        title: "Insufficient amount!",
+        description: `Shouldn't lesser than ${data.min}`,
+        duration: 1500,
+      });
+      return;
     }
+
+    if (account)
+      projectContract(addr)
+        .methods.contribute()
+        .send({ from: account, value: web3.utils.toWei(token.toString(), "ether") }, (err, res) => {
+          if (err) {
+            console.log(err);
+            onClose();
+            toast({
+              status: "error",
+              title: "Transaction failed!",
+              duration: 1500,
+            });
+          } else {
+            console.log(res);
+            onClose();
+            toast({
+              status: "success",
+              title: "Transferred successfully!",
+              duration: 1500,
+            });
+          }
+        });
   };
 
   useEffect(() => {
@@ -71,15 +94,18 @@ function Project() {
 
         out.donators = await projectContract(addr).methods.getInvestors().call();
 
+        out.donatorsAddr = await projectContract(addr).methods.getInvestorsAddress().call();
+
         const rs = {
           name: out["0"],
           description: out["1"],
           creator: out["2"],
-          min: out["3"],
-          target: out["4"],
+          min: out["3"] / 1e18,
+          target: out["4"] / 1e18,
           deadline: out["5"],
           investedAmount: out.investedAmount / 1e18,
           donators: out.donators,
+          donatorsAddr: out.donatorsAddr,
         };
 
         console.log(rs);
@@ -105,7 +131,7 @@ function Project() {
 
       <Grid className="w-full" templateRows="repeat(2, 1fr)" templateColumns="repeat(12, 1fr)" gap={12}>
         <GridItem rowSpan={2} colSpan={8}>
-          <Tabs isFitted variant="enclosed">
+          <Tabs isFitted variant="enclosed" size="md">
             <TabList>
               <Tab _selected={{ color: "white", bg: "teal.500" }}>
                 <InfoIcon mr="1.5" />
@@ -176,7 +202,25 @@ function Project() {
           />
         </GridItem>
 
-        <GridItem colSpan={4}>Supporter List</GridItem>
+        <GridItem colSpan={4} className="p-4 border border-gray-200 rounded">
+          <Text fontSize="xl" className="mb-2 font-semibold text-gray-600">
+            Supporters
+          </Text>
+
+          <Stack className="mt-4 overflow-y-auto max-h-72">
+            {data.donatorsAddr &&
+              data.donatorsAddr.map((addr, i) => (
+                <div key={i}>
+                  <HStack>
+                    <Avatar name="Dan Abrahmov" src="https://bit.ly/dan-abramov" />
+                    <Tooltip label={addr}>
+                      <Text className="truncate">{addr}</Text>
+                    </Tooltip>
+                  </HStack>
+                </div>
+              ))}
+          </Stack>
+        </GridItem>
       </Grid>
     </div>
   );
