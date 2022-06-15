@@ -67,7 +67,7 @@ function ProjectCard({
         <Flex>
           <HStack spacing="2">
             <TimeIcon />
-            <Text>{daysLeft} days left</Text>
+            <Text>{!(daysLeft < 0) ? `${daysLeft} days left` : `${daysLeft} days ago`}</Text>
           </HStack>
           <Spacer />
           <HStack spacing="2">

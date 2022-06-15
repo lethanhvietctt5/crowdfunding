@@ -57,7 +57,7 @@ const ListProjects = ({ newProjects = [] }) => {
           donators={item.donators}
           title={item.name}
           target={item.target}
-          daysLeft={Math.ceil(Math.abs(new Date(+item.deadline) - new Date()) / (1000 * 60 * 60 * 24))}
+          daysLeft={Math.ceil((new Date(+item.deadline) - new Date()) / (1000 * 60 * 60 * 24))}
         />
       ))}
     </HStack>

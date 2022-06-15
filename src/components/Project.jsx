@@ -198,7 +198,7 @@ function Project() {
             donators={data.donators}
             target={data.target}
             options={{ haveBnx: false, haveTxt: false, navigable: false }}
-            daysLeft={Math.ceil(Math.abs(new Date(+data.deadline) - new Date()) / (1000 * 60 * 60 * 24))}
+            daysLeft={Math.ceil((new Date(+data.deadline) - new Date()) / (1000 * 60 * 60 * 24))}
           />
         </GridItem>
 
