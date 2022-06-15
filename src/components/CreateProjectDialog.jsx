@@ -21,6 +21,7 @@ import {
   NumberDecrementStepper,
   forwardRef,
   FormHelperText,
+  useToast,
 } from "@chakra-ui/react";
 import { useContext, useRef, useState } from "react";
 import DatePicker from "react-datepicker";
@@ -34,6 +35,7 @@ function CreateProjectButton() {
   const [startDate, setStartDate] = useState(new Date());
   const initialRef = useRef(null);
   const { account } = useContext(AccountContext);
+  const toast = useToast();
 
   const {
     register,
@@ -69,6 +71,12 @@ function CreateProjectButton() {
             if (err) console.log(err);
             console.log(data);
             onClose();
+            toast({
+              title: "Created project successfully!",
+              status: "success",
+              duration: 1500,
+              isClosable: true,
+            });
           });
       } catch (e) {
         console.log(e);

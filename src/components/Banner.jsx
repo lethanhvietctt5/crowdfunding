@@ -39,7 +39,7 @@ function Banner() {
           </Button>
         </Flex>
 
-        <div className="w-10/12 py-12 mx-auto overflow-x-scroll">
+        <div className="w-2/3 py-12 mx-auto overflow-x-scroll">
           <ListProjects newProjects={newProjects} />
         </div>
       </div>

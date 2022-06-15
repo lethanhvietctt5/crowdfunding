@@ -1,8 +1,10 @@
 import { TimeIcon } from "@chakra-ui/icons";
-import { Avatar, Box, Flex, Image, Progress, Text, Stack, HStack, Spacer } from "@chakra-ui/react";
+import { Avatar, Box, Flex, Image, Progress, Text, Stack, HStack, Spacer, Tooltip } from "@chakra-ui/react";
+import { useNavigate } from "react-router-dom";
 import { MdiHeart } from "./commons/icons/MdiHeart";
 
 function ProjectCard({
+  address = "",
   byWho = "",
   title = "None title",
   desc = "None description",
@@ -10,25 +12,45 @@ function ProjectCard({
   target = 0,
   daysLeft = 0,
   donators = 0,
+  options = { haveTxt: true, haveBnx: true, navigable: true },
 }) {
+  const { haveBnx, haveTxt, navigable } = options;
+  const navigator = useNavigate();
+
   return (
-    <Box borderRadius="lg" className="border border-gray-100 shadow-lg" maxWidth="xs">
-      <div className="header-thumbnail">
-        <Image borderTopRadius="lg" height="200px" width={"full"} src="https://bit.ly/dan-abramov" alt="Dan Abramov" />
-      </div>
+    <Box
+      borderRadius="lg"
+      className={`border border-gray-100 shadow-lg${navigable && " cursor-pointer"}`}
+      onClick={() => navigable && navigator(`px/${address}`)}
+      maxWidth="xs">
+      {haveBnx && (
+        <div className="header-thumbnail">
+          <Image
+            borderTopRadius="lg"
+            height="200px"
+            width={"full"}
+            src="https://bit.ly/dan-abramov"
+            alt="Dan Abramov"
+          />
+        </div>
+      )}
 
       <Stack className="body-content" spacing={"6"} mt="4" px="4" pb="12">
         <HStack>
           <Avatar name="Dan Abrahmov" src="https://bit.ly/dan-abramov" />
-          <Text className="truncate">by {byWho}</Text>
+          <Tooltip label={byWho}>
+            <Text className="truncate">by {byWho}</Text>
+          </Tooltip>
         </HStack>
 
-        <Stack spacing="1">
-          <Text noOfLines={"1"} fontSize="lg" fontWeight="bold">
-            {title}
-          </Text>
-          <Text noOfLines={"2"}>{desc}</Text>
-        </Stack>
+        {haveTxt && (
+          <Stack spacing="1">
+            <Text noOfLines={"1"} fontSize="lg" fontWeight="bold">
+              {title}
+            </Text>
+            <Text noOfLines={"2"}>{desc}</Text>
+          </Stack>
+        )}
 
         <Stack>
           <div>

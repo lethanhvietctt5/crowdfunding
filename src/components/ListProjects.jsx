@@ -9,26 +9,22 @@ const ListProjects = ({ newProjects = [] }) => {
 
   useEffect(() => {
     const getInfos = async () => {
-      const arr = newProjects.map(async (addr) => {
-        const out = await projectContract(addr)
-          .methods.info()
-          .call({}, (err) => {
-            if (err) console.log(err);
-          });
+      const arr = newProjects
+        .map(async (addr) => {
+          try {
+            const out = await projectContract(addr).methods.info().call();
 
-        out.investedAmount = await projectContract(addr)
-          .methods.investorsAmount(addr)
-          .call({}, (err) => {
-            if (err) console.log(err);
-          });
+            out.investedAmount = await projectContract(addr).methods.investorsAmount(addr).call();
 
-        out.donators = await projectContract(addr)
-          .methods.getInvestors()
-          .call({}, (err) => {
-            if (err) console.log(err);
-          });
-        return out;
-      });
+            out.donators = await projectContract(addr).methods.getInvestors().call();
+            out.address = addr;
+            return out;
+          } catch (e) {
+            console.log(e);
+          }
+        })
+        .reverse()
+        .slice(0, 5);
 
       const p = await Promise.all(arr);
       const rs = p.map((x) => ({
@@ -40,6 +36,7 @@ const ListProjects = ({ newProjects = [] }) => {
         deadline: x["5"],
         investedAmount: x.investedAmount,
         donators: x.donators,
+        address: x.address,
       }));
       console.log(rs);
       setData(rs);
@@ -49,10 +46,11 @@ const ListProjects = ({ newProjects = [] }) => {
   }, [newProjects]);
 
   return (
-    <HStack spacing="8">
+    <HStack spacing="8" className="max-w-full">
       {data.map((item, i) => (
         <ProjectCard
           key={i}
+          address={item.address}
           byWho={item.creator}
           currentAt={item.investedAmount}
           desc={item.description}

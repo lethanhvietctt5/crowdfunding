@@ -1,9 +1,8 @@
 import { ChakraProvider, extendTheme } from "@chakra-ui/react";
-import Banner from "components/Banner";
-import Footer from "components/Footer";
-import Header from "components/Header";
+import MainRouter from "components/MainRouter";
 import AccountContext from "context/account";
 import React, { useEffect, useState } from "react";
+import { BrowserRouter } from "react-router-dom";
 
 const theme = extendTheme({
   fonts: {
@@ -28,17 +27,13 @@ function App() {
   }, []);
 
   return (
-    <ChakraProvider theme={theme}>
-      <AccountContext.Provider value={{ account, setaccount }}>
-        <div className="App w-full min-h-screen flex flex-col justify-between">
-          <div>
-            <Header />
-            <Banner />
-          </div>
-          <Footer />
-        </div>
-      </AccountContext.Provider>
-    </ChakraProvider>
+    <BrowserRouter>
+      <ChakraProvider theme={theme}>
+        <AccountContext.Provider value={{ account, setaccount }}>
+          <MainRouter />
+        </AccountContext.Provider>
+      </ChakraProvider>
+    </BrowserRouter>
   );
 }
 
