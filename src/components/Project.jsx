@@ -2,9 +2,9 @@ import {
   Avatar,
   Button,
   FormControl,
+  FormHelperText,
   FormLabel,
   HStack,
-  Input,
   Modal,
   ModalBody,
   ModalCloseButton,
@@ -12,6 +12,11 @@ import {
   ModalFooter,
   ModalHeader,
   ModalOverlay,
+  NumberDecrementStepper,
+  NumberIncrementStepper,
+  NumberInput,
+  NumberInputField,
+  NumberInputStepper,
   Spinner,
   Stack,
   Tab,
@@ -35,6 +40,8 @@ import ProjectCard from "./ProjectCard";
 import { LaDonate } from "./commons/icons/LaDonate";
 import { useContext } from "react";
 import AccountContext from "context/account";
+import ListRequests from "./ListRequests";
+import { useForm } from "react-hook-form";
 
 function Project() {
   const [data, setData] = useState(null);
@@ -44,17 +51,27 @@ function Project() {
   const toast = useToast();
   const { account } = useContext(AccountContext);
   const { isOpen, onOpen, onClose } = useDisclosure();
-  const [token, setToken] = useState(0);
+
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm({ defaultValues: { token: 0 } });
 
   const initialRef = useRef(null);
 
-  const handleContribute = () => {
-    if (token < data.min) {
+  const isCreator = () => account && data.creator && account.toLowerCase() === data.creator.toLowerCase();
+  const isSupporter = () =>
+    data.donatorsAddr && data.donatorsAddr.some((value) => account.toLowerCase() === value.toLowerCase());
+
+  const handleContribute = (values) => {
+    if (values.token < data.min) {
       toast({
         status: "error",
         title: "Insufficient amount!",
-        description: `Shouldn't lesser than ${data.min}`,
+        description: `Shouldn't be lesser than ${data.min}`,
         duration: 1500,
+        isClosable: true,
       });
       return;
     }
@@ -62,14 +79,14 @@ function Project() {
     if (account)
       projectContract(addr)
         .methods.contribute()
-        .send({ from: account, value: web3.utils.toWei(token.toString(), "ether") }, (err, res) => {
+        .send({ from: account, value: web3.utils.toWei(values.token.toString(), "ether") }, (err, res) => {
           if (err) {
             console.log(err);
-            onClose();
             toast({
               status: "error",
               title: "Transaction failed!",
               duration: 1500,
+              isClosable: true,
             });
           } else {
             console.log(res);
@@ -78,6 +95,7 @@ function Project() {
               status: "success",
               title: "Transferred successfully!",
               duration: 1500,
+              isClosable: true,
             });
           }
         });
@@ -94,8 +112,7 @@ function Project() {
 
         out.donatorsAddr = await projectContract(addr).methods.getInvestorsAddress().call();
 
-        console.log(projectContract(addr).methods);
-
+        // console.log(out);
         const rs = {
           name: out["0"],
           description: out["1"],
@@ -124,7 +141,7 @@ function Project() {
   if (loading) return <Spinner className="mx-auto" />;
 
   return (
-    <div className="w-2/3 mx-auto mt-16">
+    <div className="w-10/12 mx-auto mt-16">
       <Text fontSize="4xl" className="mb-4 font-semibold text-gray-600">
         {data.name}
       </Text>
@@ -147,8 +164,14 @@ function Project() {
               <TabPanel>
                 <Text>{data.description}</Text>
               </TabPanel>
+
               <TabPanel>
-                <p>TODO!</p>
+                <ListRequests
+                  projAddr={addr}
+                  amountRaised={data.investedAmount}
+                  isCreator={isCreator()}
+                  isSupporter={isSupporter()}
+                />
               </TabPanel>
             </TabPanels>
           </Tabs>
@@ -167,39 +190,48 @@ function Project() {
 
           <Modal initialFocusRef={initialRef} isOpen={isOpen} onClose={onClose}>
             <ModalOverlay />
-            <ModalContent>
-              <ModalHeader>Contribute to the Project</ModalHeader>
-              <ModalCloseButton />
-              <ModalBody pb={6}>
-                <FormControl>
-                  <FormLabel>Amount to send</FormLabel>
-                  <Input
-                    type="number"
-                    ref={initialRef}
-                    value={token}
-                    onChange={(v) => setToken(v.target.value)}
-                    placeholder="Type the amount to send"
-                  />
-                </FormControl>
-              </ModalBody>
+            <form onSubmit={handleSubmit(handleContribute)}>
+              <ModalContent>
+                <ModalHeader>Contribute to the Project</ModalHeader>
+                <ModalCloseButton />
+                <ModalBody pb={6}>
+                  <FormControl>
+                    <FormLabel>Amount to send</FormLabel>
+                    <NumberInput min={data.min}>
+                      <NumberInputField
+                        placeholder="Type the amount to send"
+                        ref={initialRef}
+                        {...register("token", { required: true, valueAsNumber: true, min: data.min })}
+                      />
+                      <NumberInputStepper>
+                        <NumberIncrementStepper />
+                        <NumberDecrementStepper />
+                      </NumberInputStepper>
+                    </NumberInput>
+                    {errors.token && <FormHelperText>ErrorType: {errors.token.type}</FormHelperText>}
+                  </FormControl>
+                </ModalBody>
 
-              <ModalFooter>
-                <Button colorScheme="teal" mr={3} onClick={handleContribute}>
-                  Send
-                </Button>
-                <Button onClick={onClose}>Cancel</Button>
-              </ModalFooter>
-            </ModalContent>
+                <ModalFooter>
+                  <Button colorScheme="teal" mr={3} type="submit">
+                    Send
+                  </Button>
+                  <Button onClick={onClose}>Cancel</Button>
+                </ModalFooter>
+              </ModalContent>
+            </form>
           </Modal>
 
-          <ProjectCard
-            byWho={data.creator}
-            currentAt={data.investedAmount}
-            donators={data.donators}
-            target={data.target}
-            options={{ haveBnx: false, haveTxt: false, navigable: false }}
-            daysLeft={Math.ceil((new Date(+data.deadline) - new Date()) / (1000 * 60 * 60 * 24))}
-          />
+          <div className="w-full">
+            <ProjectCard
+              byWho={data.creator}
+              currentAt={data.investedAmount}
+              donators={data.donators}
+              target={data.target}
+              options={{ haveBnx: false, haveTxt: false, navigable: false }}
+              daysLeft={Math.ceil((new Date(+data.deadline) - new Date()) / (1000 * 60 * 60 * 24))}
+            />
+          </div>
         </GridItem>
 
         <GridItem colSpan={4} className="p-4 border border-gray-200 rounded">

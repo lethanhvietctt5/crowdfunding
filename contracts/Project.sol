@@ -58,6 +58,8 @@ contract Project {
     }
 
     function createRequest(uint256 amount, string memory desc, address payable recipient) public onlyOwner {
+        require(address(this).balance >= targetAmount, "Not met goal yet.");
+
         Request storage newReq = requests[reqIndex++];
         newReq.amount = amount;
         newReq.description = desc;
@@ -77,13 +79,26 @@ contract Project {
         request.accreditCount++;
     }
 
-    function resolveRequest(uint256 ind) public onlyOwner {
+    function resolveRequest(uint256 ind) external onlyOwner {
         Request storage request = requests[ind];
 
         require(request.accreditCount > (investorsAddress.length / 2), "Not enough votes");
         require(!request.isDone, "Has been done");
 
-        request.recipient.transfer(request.amount);
+        require(request.amount <= address(this).balance, "Invalid amount");
+        (bool ok, ) = request.recipient.call{ value: request.amount }("");
+        require(ok, "Transfer failed.");
+        request.isDone = true;
+    }
+
+    function withdraw() external {
+        require(address(this).balance < targetAmount, "Goal has been achieved");
+        require(block.timestamp > finishTime, "Not met finishing time");
+
+        uint256 amountToWithdraw = investorsAmount[msg.sender];
+        investorsAmount[msg.sender] = 0;
+        (bool ok, ) = msg.sender.call{ value: amountToWithdraw }("");
+        require(ok, "Transfer failed.");                
     }
 
     function getIsAccreditedRequest(uint256 ind) external view returns (bool) {

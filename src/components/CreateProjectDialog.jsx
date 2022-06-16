@@ -150,7 +150,7 @@ function CreateProjectButton() {
               </FormControl>
               <FormControl>
                 <FormLabel htmlFor="min">Minimum Per Contribution</FormLabel>
-                <NumberInput id="minimum-contribution" name="min">
+                <NumberInput id="minimum-contribution" name="min" min={0}>
                   <NumberInputField
                     type="number"
                     {...register("min", { required: true, min: 0, valueAsNumber: true })}
@@ -164,7 +164,7 @@ function CreateProjectButton() {
               </FormControl>
               <FormControl>
                 <FormLabel htmlFor="target">Target Amount</FormLabel>
-                <NumberInput id="target-amount" name="target">
+                <NumberInput id="target-amount" name="target" min={0}>
                   <NumberInputField
                     type="number"
                     {...register("target", { required: true, min: 0, valueAsNumber: true })}

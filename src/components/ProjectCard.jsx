@@ -12,16 +12,16 @@ function ProjectCard({
   target = 0,
   daysLeft = 0,
   donators = 0,
-  options = { haveTxt: true, haveBnx: true, navigable: true },
+  options = { haveTxt: true, haveBnx: true, navigable: true, w: true },
 }) {
-  const { haveBnx, haveTxt, navigable } = options;
+  const { haveBnx, haveTxt, navigable, w } = options;
   const navigator = useNavigate();
 
   return (
     <Box
+      maxWidth={w ? "xs" : "inherit"}
       className={`border border-gray-200 rounded shadow-lg${navigable && " cursor-pointer"}`}
-      onClick={() => navigable && navigator(`px/${address}`)}
-      maxWidth="xs">
+      onClick={() => navigable && navigator(`px/${address}`)}>
       {haveBnx && (
         <div className="header-thumbnail">
           <Image
@@ -67,7 +67,7 @@ function ProjectCard({
         <Flex>
           <HStack spacing="2">
             <TimeIcon />
-            <Text>{!(daysLeft < 0) ? `${daysLeft} days left` : `${daysLeft} days ago`}</Text>
+            <Text>{!(daysLeft < 0) ? `${daysLeft} days left` : `${-daysLeft} days ago`}</Text>
           </HStack>
           <Spacer />
           <HStack spacing="2">
