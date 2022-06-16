@@ -91,6 +91,25 @@ contract Project {
         request.isDone = true;
     }
 
+    function removeInvestorAddress(address inv) internal returns(bool) {
+        bool found = false;
+        uint256 pos;
+        for (uint256 i = 0; i < investorsAddress.length; i++) {
+            if (investorsAddress[i] == inv) {
+                pos = i;
+                found = true;
+                break;
+            }
+        }
+        if (!found) return found;
+
+        for (uint256 i = pos; i < investorsAddress.length - 1; i++) {
+            investorsAddress[i] = investorsAddress[i + 1];
+        }
+        investorsAddress.pop();
+        return found;
+    }
+
     function withdraw() external {
         require(address(this).balance < targetAmount, "Goal has been achieved");
         require(block.timestamp > finishTime, "Not met finishing time");
@@ -98,7 +117,8 @@ contract Project {
         uint256 amountToWithdraw = investorsAmount[msg.sender];
         investorsAmount[msg.sender] = 0;
         (bool ok, ) = msg.sender.call{ value: amountToWithdraw }("");
-        require(ok, "Transfer failed.");                
+        require(ok, "Transfer failed.");
+        require(removeInvestorAddress(msg.sender), "Ditching off the address failed");
     }
 
     function getIsAccreditedRequest(uint256 ind) external view returns (bool) {

@@ -66,7 +66,7 @@ function CreateProjectButton() {
             account,
             Web3.utils.toWei(values.min.toString(), "ether"),
             Web3.utils.toWei(values.target.toString(), "ether"),
-            new Date(values.deadline).getTime()
+            Math.floor(new Date(values.deadline).getTime() / 1000)
           )
           .send({ from: account }, (err, data) => {
             if (err) console.log(err);

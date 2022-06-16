@@ -31,7 +31,7 @@ const ListProjects = ({ newProjects = [] }) => {
         creator: x["2"],
         min: x["3"] / 1e18,
         target: x["4"] / 1e18,
-        deadline: x["5"],
+        deadline: x["5"] * 1000,
         investedAmount: x["6"] / 1e18,
         donators: x.donators,
         address: x.address,
