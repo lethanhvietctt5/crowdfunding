@@ -70,7 +70,11 @@ function ListRequests({ projAddr, amountRaised, isCreator, isSupporter }) {
       setLoadingCrReqBtn(true);
 
       projectContract(projAddr)
-        .methods.createRequest(Web3.utils.toWei(values.amount.toString(), "ether"), values.desc, values.recipient)
+        .methods.createRequest(
+          Web3.utils.toWei(values.amount.toString(), "ether"),
+          values.desc,
+          values.recipient
+        )
         .send({ from: account }, (err, res) => {
           if (err) {
             console.log(err);
@@ -164,7 +168,9 @@ function ListRequests({ projAddr, amountRaised, isCreator, isSupporter }) {
         const p = Array.apply(null, { length: ind })
           .map(Number.call, Number)
           .map(async (i) => {
-            const out = await projectContract(projAddr).methods.requests(i).call();
+            const out = await projectContract(projAddr)
+              .methods.requests(i)
+              .call();
 
             if (isSupporter)
               out.meAccredited = await projectContract(projAddr)
@@ -177,11 +183,15 @@ function ListRequests({ projAddr, amountRaised, isCreator, isSupporter }) {
           });
 
         const arr = await Promise.all(p);
-        console.log(arr);
         setData(arr);
       } catch (e) {
         console.log(e);
-        toast({ title: "Fetching failed", description: e.message, status: "error", duration: 1500 });
+        toast({
+          title: "Fetching failed",
+          description: e.message,
+          status: "error",
+          duration: 1500,
+        });
       }
     };
 
@@ -192,7 +202,9 @@ function ListRequests({ projAddr, amountRaised, isCreator, isSupporter }) {
     <>
       <TableContainer>
         <Table>
-          {!data.length && <TableCaption>There's no request created yet</TableCaption>}
+          {!data.length && (
+            <TableCaption>There's no request created yet</TableCaption>
+          )}
           <Thead>
             <Tr>
               <Th>#</Th>
@@ -226,7 +238,11 @@ function ListRequests({ projAddr, amountRaised, isCreator, isSupporter }) {
                   </Td>
                   <Td>
                     <div className="flex justify-center">
-                      {item.isDone ? <CheckCircleIcon color="green.500" /> : <CloseIcon color="red.500" />}
+                      {item.isDone ? (
+                        <CheckCircleIcon color="green.500" />
+                      ) : (
+                        <CloseIcon color="red.500" />
+                      )}
                     </div>
                   </Td>
                   {isSupporter && (
@@ -279,7 +295,12 @@ function ListRequests({ projAddr, amountRaised, isCreator, isSupporter }) {
         </Table>
       </TableContainer>
 
-      <Flex minWidth="max-content" alignItems="center" gap="2" className="mt-12">
+      <Flex
+        minWidth="max-content"
+        alignItems="center"
+        gap="2"
+        className="mt-12"
+      >
         <Spacer />
         {isCreator && (
           <Button colorScheme="teal" onClick={onOpen}>
@@ -302,19 +323,32 @@ function ListRequests({ projAddr, amountRaised, isCreator, isSupporter }) {
                     <NumberInputField
                       id="amount"
                       name="amount"
-                      {...register("amount", { min: 0, max: amountRaised, valueAsNumber: true })}
+                      {...register("amount", {
+                        min: 0,
+                        max: amountRaised,
+                        valueAsNumber: true,
+                      })}
                     />
                     <NumberInputStepper>
                       <NumberIncrementStepper />
                       <NumberDecrementStepper />
                     </NumberInputStepper>
                   </NumberInput>
-                  {errors.amount && <FormHelperText>ErrorType: {errors.amount.type}</FormHelperText>}
+                  {errors.amount && (
+                    <FormHelperText>
+                      ErrorType: {errors.amount.type}
+                    </FormHelperText>
+                  )}
                 </FormControl>
 
                 <FormControl>
                   <FormLabel>Description</FormLabel>
-                  <Input type="text" id="desc" name="desc" {...register("desc")} />
+                  <Input
+                    type="text"
+                    id="desc"
+                    name="desc"
+                    {...register("desc")}
+                  />
                 </FormControl>
 
                 <FormControl>
@@ -323,14 +357,26 @@ function ListRequests({ projAddr, amountRaised, isCreator, isSupporter }) {
                     type="text"
                     id="recipient"
                     name="recipient"
-                    {...register("recipient", { required: true, validate: (value) => Web3.utils.isAddress(value) })}
+                    {...register("recipient", {
+                      required: true,
+                      validate: (value) => Web3.utils.isAddress(value),
+                    })}
                   />
-                  {errors.recipient && <FormHelperText>ErrorType: {errors.recipient.type}</FormHelperText>}
+                  {errors.recipient && (
+                    <FormHelperText>
+                      ErrorType: {errors.recipient.type}
+                    </FormHelperText>
+                  )}
                 </FormControl>
               </ModalBody>
 
               <ModalFooter>
-                <Button colorScheme="teal" mr={3} type="submit" isLoading={loadingCrReqBtn}>
+                <Button
+                  colorScheme="teal"
+                  mr={3}
+                  type="submit"
+                  isLoading={loadingCrReqBtn}
+                >
                   Create
                 </Button>
                 <Button onClick={onClose} variant="ghost">
