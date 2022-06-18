@@ -71,7 +71,6 @@ function CreateProjectButton() {
           .send({ from: account }, (err, data) => {
             if (err) console.log(err);
 
-            console.log(data);
             if (data) {
               onClose();
               toast({
@@ -102,7 +101,9 @@ function CreateProjectButton() {
         value={value}
         onChange={onChange}
       />
-      {errors.deadline && <FormHelperText>Error: date {errors.deadline.type}</FormHelperText>}
+      {errors.deadline && (
+        <FormHelperText>Error: date {errors.deadline.type}</FormHelperText>
+      )}
     </>
   ));
 
@@ -114,11 +115,17 @@ function CreateProjectButton() {
         color="teal.500"
         className="mr-4"
         fontSize={"sm"}
-        onClick={onOpen}>
+        onClick={onOpen}
+      >
         Create Project
       </Button>
 
-      <Modal isOpen={isOpen} onClose={onClose} size="xl" initialFocusRef={initialRef}>
+      <Modal
+        isOpen={isOpen}
+        onClose={onClose}
+        size="xl"
+        initialFocusRef={initialRef}
+      >
         <ModalOverlay />
         <form onSubmit={handleSubmit(onSubmit)}>
           <ModalContent>
@@ -135,7 +142,11 @@ function CreateProjectButton() {
                   placeholder="Your project name"
                   {...register("name", { required: true })}
                 />
-                {errors.name && <FormHelperText>Error: name {errors.name.type}</FormHelperText>}
+                {errors.name && (
+                  <FormHelperText>
+                    Error: name {errors.name.type}
+                  </FormHelperText>
+                )}
               </FormControl>
               <FormControl>
                 <FormLabel htmlFor="description">Description</FormLabel>
@@ -146,35 +157,53 @@ function CreateProjectButton() {
                   maxHeight={"40"}
                   {...register("description", { required: true })}
                 />
-                {errors.description && <FormHelperText>Error: description {errors.description.type}</FormHelperText>}
+                {errors.description && (
+                  <FormHelperText>
+                    Error: description {errors.description.type}
+                  </FormHelperText>
+                )}
               </FormControl>
               <FormControl>
                 <FormLabel htmlFor="min">Minimum Per Contribution</FormLabel>
                 <NumberInput id="minimum-contribution" name="min" min={0}>
                   <NumberInputField
                     type="number"
-                    {...register("min", { required: true, min: 0, valueAsNumber: true })}
+                    {...register("min", {
+                      required: true,
+                      min: 0,
+                      valueAsNumber: true,
+                    })}
                   />
                   <NumberInputStepper>
                     <NumberIncrementStepper />
                     <NumberDecrementStepper />
                   </NumberInputStepper>
                 </NumberInput>
-                {errors.min && <FormHelperText>ErrorType: {errors.min.type}</FormHelperText>}
+                {errors.min && (
+                  <FormHelperText>ErrorType: {errors.min.type}</FormHelperText>
+                )}
               </FormControl>
               <FormControl>
                 <FormLabel htmlFor="target">Target Amount</FormLabel>
                 <NumberInput id="target-amount" name="target" min={0}>
                   <NumberInputField
                     type="number"
-                    {...register("target", { required: true, min: 0, valueAsNumber: true })}
+                    {...register("target", {
+                      required: true,
+                      min: 0,
+                      valueAsNumber: true,
+                    })}
                   />
                   <NumberInputStepper>
                     <NumberIncrementStepper />
                     <NumberDecrementStepper />
                   </NumberInputStepper>
                 </NumberInput>
-                {errors.target && <FormHelperText>ErrorType: {errors.target.type}</FormHelperText>}
+                {errors.target && (
+                  <FormHelperText>
+                    ErrorType: {errors.target.type}
+                  </FormHelperText>
+                )}
               </FormControl>
               <FormControl>
                 <FormLabel htmlFor="deadline">Fulfilled Date</FormLabel>

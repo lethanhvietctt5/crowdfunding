@@ -5,7 +5,7 @@ module.exports = function (deployer) {
     Project,
     "Origin Project",
     "",
-    "0xAd1B6C9948eb2b2F4EbaaE82b8c43212927C609a",
+    "0x9Ab481754B24465C159E4C33dC5D95141483948f",
     0,
     0,
     new Date().getTime()

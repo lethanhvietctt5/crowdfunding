@@ -1,4 +1,4 @@
-import { HStack } from "@chakra-ui/react";
+import { Grid, GridItem, HStack } from "@chakra-ui/react";
 import { useEffect } from "react";
 import { useState } from "react";
 import projectContract from "utils/projectContract";
@@ -14,7 +14,9 @@ const ListProjects = ({ newProjects = [] }) => {
           try {
             const out = await projectContract(addr).methods.info().call();
 
-            out.donators = await projectContract(addr).methods.getInvestors().call();
+            out.donators = await projectContract(addr)
+              .methods.getInvestors()
+              .call();
             out.address = addr;
             return out;
           } catch (e) {
@@ -36,7 +38,6 @@ const ListProjects = ({ newProjects = [] }) => {
         donators: x.donators,
         address: x.address,
       }));
-      console.log(rs);
       setData(rs);
     };
 
@@ -44,21 +45,25 @@ const ListProjects = ({ newProjects = [] }) => {
   }, [newProjects]);
 
   return (
-    <HStack spacing="8" className="max-w-full">
+    <Grid templateColumns="repeat(4, 1fr)" gap={6}>
       {data.map((item, i) => (
-        <ProjectCard
-          key={i}
-          address={item.address}
-          byWho={item.creator}
-          currentAt={item.investedAmount}
-          desc={item.description}
-          donators={item.donators}
-          title={item.name}
-          target={item.target}
-          daysLeft={Math.ceil((new Date(+item.deadline) - new Date()) / (1000 * 60 * 60 * 24))}
-        />
+        <GridItem>
+          <ProjectCard
+            key={i}
+            address={item.address}
+            byWho={item.creator}
+            currentAt={item.investedAmount}
+            desc={item.description}
+            donators={item.donators}
+            title={item.name}
+            target={item.target}
+            daysLeft={Math.ceil(
+              (new Date(+item.deadline) - new Date()) / (1000 * 60 * 60 * 24)
+            )}
+          />
+        </GridItem>
       ))}
-    </HStack>
+    </Grid>
   );
 };
 
