@@ -115,7 +115,6 @@ function ListRequests({ projAddr, amountRaised, isCreator, isSupporter }) {
               isClosable: true,
             });
           } else {
-            console.log(res);
             toast({
               title: "Request verified!",
               status: "success",
@@ -158,7 +157,6 @@ function ListRequests({ projAddr, amountRaised, isCreator, isSupporter }) {
     }
   };
 
-  // console.log(projectContract(projAddr).methods);
   useEffect(() => {
     const fetch = async () => {
       try {
@@ -210,6 +208,22 @@ function ListRequests({ projAddr, amountRaised, isCreator, isSupporter }) {
       setData([...data, newRequest]);
     });
   }, [projAddr, isSupporter, data]);
+
+  useEffect(() => {
+    const contract = projectContract(projAddr);
+    contract.events.AccreditRequest({}).on("data", (event) => {
+      const newListRequest = [...data];
+      newListRequest[event.returnValues.index].meAccredited = true;
+      newListRequest[event.returnValues.index].accreditCount =
+        +newListRequest[event.returnValues.index] + 1;
+
+      if (account === event.returnValues.investor) {
+        newListRequest[event.returnValues.index].meAccredited = true;
+      }
+      console.log(newListRequest);
+      setData([...newListRequest]);
+    });
+  }, [data, projAddr, account]);
 
   return (
     <>

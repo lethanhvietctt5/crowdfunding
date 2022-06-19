@@ -37,6 +37,7 @@ contract Project {
         bool isDone,
         uint256 accreditCount
     );
+    event AccreditRequest(uint index, address investor);
 
     constructor(
         string memory projectName,
@@ -96,6 +97,7 @@ contract Project {
 
         request.investorsAccredited[msg.sender] = true;
         request.accreditCount++;
+        emit AccreditRequest(ind, msg.sender);
     }
 
     function resolveRequest(uint256 ind) external onlyOwner {
