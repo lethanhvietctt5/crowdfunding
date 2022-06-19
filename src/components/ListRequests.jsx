@@ -197,38 +197,44 @@ function ListRequests({ projAddr, amountRaised, isCreator, isSupporter }) {
   useEffect(() => {
     const constract = projectContract(projAddr);
     constract.events.CreateRequest({}).on("data", (event) => {
-      const newRequest = event.returnValues;
-      if (isSupporter) {
-        newRequest.meAccredited = false;
-      }
+      if (event.returnValues.projectAddress === projAddr) {
+        const newRequest = event.returnValues;
+        if (isSupporter) {
+          newRequest.meAccredited = false;
+        }
 
-      newRequest.isDone = false;
-      newRequest.amount = newRequest.amount / 1e18;
-      setData([...data, newRequest]);
+        newRequest.isDone = false;
+        newRequest.amount = newRequest.amount / 1e18;
+        setData([...data, newRequest]);
+      }
     });
   }, [projAddr, isSupporter, data]);
 
   useEffect(() => {
     const contract = projectContract(projAddr);
     contract.events.AccreditRequest({}).on("data", (event) => {
-      const newListRequest = [...data];
-      newListRequest[event.returnValues.index].meAccredited = true;
-      newListRequest[event.returnValues.index].accreditCount =
-        +newListRequest[event.returnValues.index] + 1;
-
-      if (account === event.returnValues.investor) {
+      if (event.returnValues.projectAddress === projAddr) {
+        const newListRequest = [...data];
         newListRequest[event.returnValues.index].meAccredited = true;
+        newListRequest[event.returnValues.index].accreditCount =
+          +newListRequest[event.returnValues.index] + 1;
+
+        if (account === event.returnValues.investor) {
+          newListRequest[event.returnValues.index].meAccredited = true;
+        }
+        setData([...newListRequest]);
       }
-      setData([...newListRequest]);
     });
   }, [data, projAddr, account]);
 
   useEffect(() => {
     const contract = projectContract(projAddr);
     contract.events.ResolveRequest({}).on("data", (event) => {
-      const newListRequest = [...data];
-      newListRequest[event.returnValues.index].isDone = true;
-      setData([...newListRequest]);
+      if (event.returnValues.projectAddress === projAddr) {
+        const newListRequest = [...data];
+        newListRequest[event.returnValues.index].isDone = true;
+        setData([...newListRequest]);
+      }
     });
   }, [data, projAddr, account]);
 

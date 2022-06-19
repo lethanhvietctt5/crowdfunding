@@ -29,16 +29,26 @@ contract Project {
         _;
     }
 
-    event Contribute(address contributor, uint256 amount);
+    event Contribute(
+        address contributor,
+        uint256 amount,
+        address projectAddress
+    );
     event CreateRequest(
         uint256 amount,
         string description,
         address recipient,
         bool isDone,
-        uint256 accreditCount
+        uint256 accreditCount,
+        address projectAddress
     );
-    event AccreditRequest(uint256 index, address investor);
-    event ResolveRequest(uint256 index);
+    event AccreditRequest(
+        uint256 index,
+        address investor,
+        address projectAddress
+    );
+    event ResolveRequest(uint256 index, address projectAddress);
+    event Withdraw(address investor, uint256 amount, address projectAddress);
 
     constructor(
         string memory projectName,
@@ -67,7 +77,7 @@ contract Project {
             investorsAmount[msg.sender] += msg.value;
         }
 
-        emit Contribute(msg.sender, msg.value);
+        emit Contribute(msg.sender, msg.value, address(this));
     }
 
     function createRequest(
@@ -83,7 +93,7 @@ contract Project {
         newReq.recipient = recipient;
         newReq.isDone = false;
         newReq.accreditCount = 0;
-        emit CreateRequest(amount, desc, recipient, false, 0);
+        emit CreateRequest(amount, desc, recipient, false, 0, address(this));
     }
 
     function accreditRequest(uint256 ind) public {
@@ -98,7 +108,7 @@ contract Project {
 
         request.investorsAccredited[msg.sender] = true;
         request.accreditCount++;
-        emit AccreditRequest(ind, msg.sender);
+        emit AccreditRequest(ind, msg.sender, address(this));
     }
 
     function resolveRequest(uint256 ind) external onlyOwner {
@@ -114,7 +124,7 @@ contract Project {
         (bool ok, ) = request.recipient.call{value: request.amount}("");
         require(ok, "Transfer failed.");
         request.isDone = true;
-        emit ResolveRequest(ind);
+        emit ResolveRequest(ind, address(this));
     }
 
     function removeInvestorAddress(address inv) internal returns (bool) {
@@ -148,6 +158,7 @@ contract Project {
             removeInvestorAddress(msg.sender),
             "Ditching off the address failed"
         );
+        emit Withdraw(msg.sender, amountToWithdraw, address(this));
     }
 
     function getIsAccreditedRequest(uint256 ind) external view returns (bool) {

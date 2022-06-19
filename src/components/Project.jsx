@@ -192,19 +192,39 @@ function Project() {
     projectContract(addr)
       .events.Contribute({})
       .on("data", (event) => {
-        let listDonators = [
-          ...data.donatorsAddr,
-          event.returnValues.contributor,
-        ];
-        let setDonators = new Set(listDonators);
+        if (event.returnValues.projectAddress === addr) {
+          let listDonators = [
+            ...data.donatorsAddr,
+            event.returnValues.contributor,
+          ];
+          let setDonators = new Set(listDonators);
 
-        setData({
-          ...data,
-          investedAmount:
-            data.investedAmount + event.returnValues.amount / 1e18,
-          donators: Array.from(setDonators).length,
-          donatorsAddr: Array.from(setDonators),
-        });
+          setData({
+            ...data,
+            investedAmount:
+              data.investedAmount + event.returnValues.amount / 1e18,
+            donators: Array.from(setDonators).length,
+            donatorsAddr: Array.from(setDonators),
+          });
+        }
+      });
+  }, [addr, data]);
+
+  useEffect(() => {
+    projectContract(addr)
+      .events.Withdraw({})
+      .on("data", (event) => {
+        if (event.returnValues.projectAddress === addr) {
+          setData({
+            ...data,
+            investedAmount:
+              data.investedAmount - event.returnValues.amount / 1e18,
+            donators: data.donators - 1,
+            donatorsAddr: data.donatorsAddr.filter(
+              (donator) => donator !== event.returnValues.investor
+            ),
+          });
+        }
       });
   }, [addr, data]);
 
