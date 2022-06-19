@@ -37,7 +37,8 @@ contract Project {
         bool isDone,
         uint256 accreditCount
     );
-    event AccreditRequest(uint index, address investor);
+    event AccreditRequest(uint256 index, address investor);
+    event ResolveRequest(uint256 index);
 
     constructor(
         string memory projectName,
@@ -113,6 +114,7 @@ contract Project {
         (bool ok, ) = request.recipient.call{value: request.amount}("");
         require(ok, "Transfer failed.");
         request.isDone = true;
+        emit ResolveRequest(ind);
     }
 
     function removeInvestorAddress(address inv) internal returns (bool) {
