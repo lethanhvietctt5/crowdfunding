@@ -52,7 +52,6 @@ function Project() {
   const toast = useToast();
   const { account } = useContext(AccountContext);
   const { isOpen, onOpen, onClose } = useDisclosure();
-  const [toggleUpdate, setToggleUpdate] = useState(false);
 
   const {
     register,

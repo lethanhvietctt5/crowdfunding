@@ -46,7 +46,7 @@ const ListProjects = ({ newProjects = [] }) => {
   return (
     <Grid templateColumns="repeat(4, 1fr)" gap={6}>
       {data.map((item, i) => (
-        <GridItem>
+        <GridItem key={i}>
           <ProjectCard
             key={i}
             address={item.address}

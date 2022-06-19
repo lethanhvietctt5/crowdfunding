@@ -30,6 +30,13 @@ contract Project {
     }
 
     event Contribute(address contributor, uint256 amount);
+    event CreateRequest(
+        uint256 amount,
+        string description,
+        address recipient,
+        bool isDone,
+        uint256 accreditCount
+    );
 
     constructor(
         string memory projectName,
@@ -74,6 +81,7 @@ contract Project {
         newReq.recipient = recipient;
         newReq.isDone = false;
         newReq.accreditCount = 0;
+        emit CreateRequest(amount, desc, recipient, false, 0);
     }
 
     function accreditRequest(uint256 ind) public {

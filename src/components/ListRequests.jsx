@@ -85,7 +85,6 @@ function ListRequests({ projAddr, amountRaised, isCreator, isSupporter }) {
               isClosable: true,
             });
           } else {
-            console.log(res);
             toast({
               title: "Created request successfully!",
               status: "success",
@@ -197,6 +196,20 @@ function ListRequests({ projAddr, amountRaised, isCreator, isSupporter }) {
 
     fetch();
   }, [projAddr, toast, account, isSupporter]);
+
+  useEffect(() => {
+    const constract = projectContract(projAddr);
+    constract.events.CreateRequest({}).on("data", (event) => {
+      const newRequest = event.returnValues;
+      if (isSupporter) {
+        newRequest.meAccredited = false;
+      }
+
+      newRequest.isDone = false;
+      newRequest.amount = newRequest.amount / 1e18;
+      setData([...data, newRequest]);
+    });
+  }, [projAddr, isSupporter, data]);
 
   return (
     <>
