@@ -61,10 +61,17 @@ function Project() {
 
   const initialRef = useRef(null);
 
-  const isCreator = () => account && data.creator && account.toLowerCase() === data.creator.toLowerCase();
+  const isCreator = () =>
+    account &&
+    data.creator &&
+    account.toLowerCase() === data.creator.toLowerCase();
   const isSupporter = () =>
-    data.donatorsAddr && data.donatorsAddr.some((value) => account.toLowerCase() === value.toLowerCase());
-  const isWithdrawable = () => data.investedAmount < data.target && Date.now() > new Date(+data.deadline);
+    data.donatorsAddr &&
+    data.donatorsAddr.some(
+      (value) => account.toLowerCase() === value.toLowerCase()
+    );
+  const isWithdrawable = () =>
+    data.investedAmount < data.target && Date.now() > new Date(+data.deadline);
 
   const handleWithdraw = () => {
     if (isSupporter && isWithdrawable) {
@@ -107,26 +114,31 @@ function Project() {
     if (account)
       projectContract(addr)
         .methods.contribute()
-        .send({ from: account, value: web3.utils.toWei(values.token.toString(), "ether") }, (err, res) => {
-          if (err) {
-            console.log(err);
-            toast({
-              status: "error",
-              title: "Transaction failed!",
-              duration: 1500,
-              isClosable: true,
-            });
-          } else {
-            console.log(res);
-            onClose();
-            toast({
-              status: "success",
-              title: "Transferred successfully!",
-              duration: 1500,
-              isClosable: true,
-            });
+        .send(
+          {
+            from: account,
+            value: web3.utils.toWei(values.token.toString(), "ether"),
+          },
+          (err, res) => {
+            if (err) {
+              console.log(err);
+              toast({
+                status: "error",
+                title: "Transaction failed!",
+                duration: 1500,
+                isClosable: true,
+              });
+            } else {
+              onClose();
+              toast({
+                status: "success",
+                title: "Transferred successfully!",
+                duration: 1500,
+                isClosable: true,
+              });
+            }
           }
-        });
+        );
   };
 
   useEffect(() => {
@@ -136,9 +148,15 @@ function Project() {
 
         const out = await projectContract(addr).methods.info().call();
 
-        out.donators = await projectContract(addr).methods.getInvestors().call();
+        out.donators = await projectContract(addr)
+          .methods.getInvestors()
+          .call();
 
-        out.donatorsAddr = await projectContract(addr).methods.getInvestorsAddress().call();
+        out.donators = +out.donators;
+
+        out.donatorsAddr = await projectContract(addr)
+          .methods.getInvestorsAddress()
+          .call();
 
         // console.log(out);
         const rs = {
@@ -153,18 +171,62 @@ function Project() {
           donatorsAddr: out.donatorsAddr,
         };
 
-        console.log(rs);
         setData(rs);
         setLoading(false);
       } catch (e) {
         console.log(e);
-        toast({ title: "Invalid address or failed", status: "error", duration: 1500, isClosable: true });
+        toast({
+          title: "Invalid address or failed",
+          status: "error",
+          duration: 1500,
+          isClosable: true,
+        });
         navigator("/404");
       }
     };
 
     getData();
   }, [addr, navigator, toast]);
+
+  useEffect(() => {
+    projectContract(addr)
+      .events.Contribute({})
+      .on("data", (event) => {
+        if (event.returnValues.projectAddress === addr) {
+          let listDonators = [
+            ...data.donatorsAddr,
+            event.returnValues.contributor,
+          ];
+          let setDonators = new Set(listDonators);
+
+          setData({
+            ...data,
+            investedAmount:
+              data.investedAmount + event.returnValues.amount / 1e18,
+            donators: Array.from(setDonators).length,
+            donatorsAddr: Array.from(setDonators),
+          });
+        }
+      });
+  }, [addr, data]);
+
+  useEffect(() => {
+    projectContract(addr)
+      .events.Withdraw({})
+      .on("data", (event) => {
+        if (event.returnValues.projectAddress === addr) {
+          setData({
+            ...data,
+            investedAmount:
+              data.investedAmount - event.returnValues.amount / 1e18,
+            donators: data.donators - 1,
+            donatorsAddr: data.donatorsAddr.filter(
+              (donator) => donator !== event.returnValues.investor
+            ),
+          });
+        }
+      });
+  }, [addr, data]);
 
   if (loading) return <Spinner className="mx-auto" />;
 
@@ -174,7 +236,12 @@ function Project() {
         {data.name}
       </Text>
 
-      <Grid className="w-full" templateRows="repeat(2, 1fr)" templateColumns="repeat(12, 1fr)" gap={12}>
+      <Grid
+        className="w-full"
+        templateRows="repeat(2, 1fr)"
+        templateColumns="repeat(12, 1fr)"
+        gap={12}
+      >
         <GridItem rowSpan={2} colSpan={8}>
           <Tabs isFitted variant="enclosed" size="md">
             <TabList>
@@ -213,7 +280,8 @@ function Project() {
               className="flex w-full mb-4"
               size="lg"
               colorScheme="purple"
-              variant={"solid"}>
+              variant={"solid"}
+            >
               Withdraw
             </Button>
           )}
@@ -224,7 +292,8 @@ function Project() {
             className="flex w-full mb-4"
             size="lg"
             colorScheme="teal"
-            variant={"solid"}>
+            variant={"solid"}
+          >
             Contribute
           </Button>
 
@@ -241,14 +310,22 @@ function Project() {
                       <NumberInputField
                         placeholder="Type the amount to send"
                         ref={initialRef}
-                        {...register("token", { required: true, valueAsNumber: true, min: data.min })}
+                        {...register("token", {
+                          required: true,
+                          valueAsNumber: true,
+                          min: data.min,
+                        })}
                       />
                       <NumberInputStepper>
                         <NumberIncrementStepper />
                         <NumberDecrementStepper />
                       </NumberInputStepper>
                     </NumberInput>
-                    {errors.token && <FormHelperText>ErrorType: {errors.token.type}</FormHelperText>}
+                    {errors.token && (
+                      <FormHelperText>
+                        ErrorType: {errors.token.type}
+                      </FormHelperText>
+                    )}
                   </FormControl>
                 </ModalBody>
 
@@ -269,7 +346,9 @@ function Project() {
               donators={data.donators}
               target={data.target}
               options={{ haveBnx: false, haveTxt: false, navigable: false }}
-              daysLeft={Math.ceil((new Date(+data.deadline) - new Date()) / (1000 * 60 * 60 * 24))}
+              daysLeft={Math.ceil(
+                (new Date(+data.deadline) - new Date()) / (1000 * 60 * 60 * 24)
+              )}
             />
           </div>
         </GridItem>
@@ -284,7 +363,10 @@ function Project() {
               data.donatorsAddr.map((addr, i) => (
                 <div key={i}>
                   <HStack>
-                    <Avatar name="Dan Abrahmov" src="https://bit.ly/dan-abramov" />
+                    <Avatar
+                      name="Dan Abrahmov"
+                      src="https://bit.ly/dan-abramov"
+                    />
                     <Tooltip label={addr}>
                       <Text className="truncate">{addr}</Text>
                     </Tooltip>

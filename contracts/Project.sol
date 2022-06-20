@@ -25,9 +25,30 @@ contract Project {
     mapping(address => uint256) public investorsAmount;
 
     modifier onlyOwner() {
-        require(msg.sender == owner, 'Sender not authorized.');
+        require(msg.sender == owner, "Sender not authorized.");
         _;
     }
+
+    event Contribute(
+        address contributor,
+        uint256 amount,
+        address projectAddress
+    );
+    event CreateRequest(
+        uint256 amount,
+        string description,
+        address recipient,
+        bool isDone,
+        uint256 accreditCount,
+        address projectAddress
+    );
+    event AccreditRequest(
+        uint256 index,
+        address investor,
+        address projectAddress
+    );
+    event ResolveRequest(uint256 index, address projectAddress);
+    event Withdraw(address investor, uint256 amount, address projectAddress);
 
     constructor(
         string memory projectName,
@@ -55,9 +76,15 @@ contract Project {
         } else {
             investorsAmount[msg.sender] += msg.value;
         }
+
+        emit Contribute(msg.sender, msg.value, address(this));
     }
 
-    function createRequest(uint256 amount, string memory desc, address payable recipient) public onlyOwner {
+    function createRequest(
+        uint256 amount,
+        string memory desc,
+        address payable recipient
+    ) public onlyOwner {
         require(address(this).balance >= targetAmount, "Not met goal yet.");
 
         Request storage newReq = requests[reqIndex++];
@@ -66,32 +93,41 @@ contract Project {
         newReq.recipient = recipient;
         newReq.isDone = false;
         newReq.accreditCount = 0;
+        emit CreateRequest(amount, desc, recipient, false, 0, address(this));
     }
 
     function accreditRequest(uint256 ind) public {
         Request storage request = requests[ind];
 
         require(investorsAmount[msg.sender] > 0, "Not an investor");
-        require(!request.investorsAccredited[msg.sender], "Has already given credit for");
+        require(
+            !request.investorsAccredited[msg.sender],
+            "Has already given credit for"
+        );
         require(!request.isDone, "Request has already been accredited");
 
         request.investorsAccredited[msg.sender] = true;
         request.accreditCount++;
+        emit AccreditRequest(ind, msg.sender, address(this));
     }
 
     function resolveRequest(uint256 ind) external onlyOwner {
         Request storage request = requests[ind];
 
-        require(request.accreditCount > (investorsAddress.length / 2), "Not enough votes");
+        require(
+            request.accreditCount > (investorsAddress.length / 2),
+            "Not enough votes"
+        );
         require(!request.isDone, "Has been done");
 
         require(request.amount <= address(this).balance, "Invalid amount");
-        (bool ok, ) = request.recipient.call{ value: request.amount }("");
+        (bool ok, ) = request.recipient.call{value: request.amount}("");
         require(ok, "Transfer failed.");
         request.isDone = true;
+        emit ResolveRequest(ind, address(this));
     }
 
-    function removeInvestorAddress(address inv) internal returns(bool) {
+    function removeInvestorAddress(address inv) internal returns (bool) {
         bool found = false;
         uint256 pos;
         for (uint256 i = 0; i < investorsAddress.length; i++) {
@@ -116,9 +152,13 @@ contract Project {
 
         uint256 amountToWithdraw = investorsAmount[msg.sender];
         investorsAmount[msg.sender] = 0;
-        (bool ok, ) = msg.sender.call{ value: amountToWithdraw }("");
+        (bool ok, ) = msg.sender.call{value: amountToWithdraw}("");
         require(ok, "Transfer failed.");
-        require(removeInvestorAddress(msg.sender), "Ditching off the address failed");
+        require(
+            removeInvestorAddress(msg.sender),
+            "Ditching off the address failed"
+        );
+        emit Withdraw(msg.sender, amountToWithdraw, address(this));
     }
 
     function getIsAccreditedRequest(uint256 ind) external view returns (bool) {
@@ -139,7 +179,15 @@ contract Project {
             uint256
         )
     {
-        return (name, description, owner, minAmout, targetAmount, finishTime, address(this).balance);
+        return (
+            name,
+            description,
+            owner,
+            minAmout,
+            targetAmount,
+            finishTime,
+            address(this).balance
+        );
     }
 
     function getInvestors() external view returns (uint256) {

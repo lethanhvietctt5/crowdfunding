@@ -5,6 +5,8 @@ import "./Project.sol";
 contract Manager {
     address[] projects;
 
+    event CreateProject(address projectAddress);
+
     function createProject(
         string memory name,
         string memory des,
@@ -23,9 +25,10 @@ contract Manager {
         );
 
         projects.push(address(newProject));
+        emit CreateProject(address(newProject));
     }
 
-    function getProjects() external view returns(address[] memory) {
+    function getProjects() external view returns (address[] memory) {
         return projects;
     }
 }
