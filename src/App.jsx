@@ -14,6 +14,11 @@ const theme = extendTheme({
 function App() {
   const [account, setaccount] = useState(null);
 
+  window.ethereum.on("accountsChanged", function (accs) {
+    // Time to reload your interface with accs[0]!
+    setaccount(accs[0]);
+  });
+
   useEffect(() => {
     async function getAccount() {
       const accounts = await window.ethereum.request({

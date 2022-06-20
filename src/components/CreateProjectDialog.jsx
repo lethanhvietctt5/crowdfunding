@@ -33,6 +33,7 @@ import Web3 from "web3";
 
 function CreateProjectButton() {
   const { isOpen, onClose, onOpen } = useDisclosure();
+  const [loadingCrBtn, setLoadingCrBtn] = useState(false);
   const [startDate, setStartDate] = useState(new Date());
   const initialRef = useRef(null);
   const { account } = useContext(AccountContext);
@@ -58,33 +59,32 @@ function CreateProjectButton() {
     // console.log(new Date(values.deadline).getTime());
     if (account) {
       const contract = managerContract();
-      try {
-        contract.methods
-          .createProject(
-            values.name,
-            values.description,
-            account,
-            Web3.utils.toWei(values.min.toString(), "ether"),
-            Web3.utils.toWei(values.target.toString(), "ether"),
-            Math.floor(new Date(values.deadline).getTime() / 1000)
-          )
-          .send({ from: account }, (err, data) => {
-            if (err) console.log(err);
+      setLoadingCrBtn(true);
 
-            console.log(data);
-            if (data) {
-              onClose();
-              toast({
-                title: "Created project successfully!",
-                status: "success",
-                duration: 1500,
-                isClosable: true,
-              });
-            }
-          });
-      } catch (e) {
-        console.log(e);
-      }
+      contract.methods
+        .createProject(
+          values.name,
+          values.description,
+          account,
+          Web3.utils.toWei(values.min.toString(), "ether"),
+          Web3.utils.toWei(values.target.toString(), "ether"),
+          Math.floor(new Date(values.deadline).getTime() / 1000)
+        )
+        .send({ from: account }, (err, data) => {
+          if (err) console.log(err);
+
+          console.log(data);
+          if (data) {
+            onClose();
+            toast({
+              title: "Created project successfully!",
+              status: "success",
+              duration: 1500,
+              isClosable: true,
+            });
+          }
+          setLoadingCrBtn(false);
+        });
       // console.log(contract);
     }
   };
@@ -191,7 +191,7 @@ function CreateProjectButton() {
             </ModalBody>
 
             <ModalFooter>
-              <Button color="teal.500" type="submit" mr={3}>
+              <Button color="teal.500" type="submit" mr={3} isLoading={loadingCrBtn}>
                 Create
               </Button>
               <Button color="gray" onClick={onClose}>
