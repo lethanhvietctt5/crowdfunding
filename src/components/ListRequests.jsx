@@ -44,7 +44,7 @@ import { IcHammer } from "./commons/icons/IcHammer";
 import { IcVerification } from "./commons/icons/IcVerification";
 import { IcVerificationOutline } from "./commons/icons/IcVerificationOutline";
 
-function ListRequests({ projAddr, amountRaised, isCreator, isSupporter }) {
+function ListRequests({ projAddr, amountRaised, isCreator, isSupporter, onRequestResolved }) {
   const [data, setData] = useState([]);
   const [loadingVrxBtn, setLoadingVrxBtn] = useState(false);
   const [loadingResxBtn, setLoadingResxBtn] = useState(false);
@@ -233,10 +233,11 @@ function ListRequests({ projAddr, amountRaised, isCreator, isSupporter }) {
       if (event.returnValues.projectAddress === projAddr) {
         const newListRequest = [...data];
         newListRequest[event.returnValues.index].isDone = true;
+        onRequestResolved(event.returnValues.newBalance / 1e18);
         setData([...newListRequest]);
       }
     });
-  }, [data, projAddr, account]);
+  }, [data, projAddr, account, onRequestResolved]);
 
   return (
     <>

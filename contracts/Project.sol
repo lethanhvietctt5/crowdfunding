@@ -47,7 +47,7 @@ contract Project {
         address investor,
         address projectAddress
     );
-    event ResolveRequest(uint256 index, address projectAddress);
+    event ResolveRequest(uint256 index, uint256 newBalance, address projectAddress);
     event Withdraw(address investor, uint256 amount, address projectAddress);
 
     constructor(
@@ -124,7 +124,7 @@ contract Project {
         (bool ok, ) = request.recipient.call{value: request.amount}("");
         require(ok, "Transfer failed.");
         request.isDone = true;
-        emit ResolveRequest(ind, address(this));
+        emit ResolveRequest(ind, address(this).balance, address(this));
     }
 
     function removeInvestorAddress(address inv) internal returns (bool) {

@@ -141,6 +141,10 @@ function Project() {
         );
   };
 
+  const handleChangeInvestedAmount = (newBalance) => {
+    setData((p) => ({ ...p, investedAmount: newBalance }))
+  }
+
   useEffect(() => {
     const getData = async () => {
       try {
@@ -266,6 +270,7 @@ function Project() {
                   amountRaised={data.investedAmount}
                   isCreator={isCreator()}
                   isSupporter={isSupporter()}
+                  onRequestResolved={handleChangeInvestedAmount}
                 />
               </TabPanel>
             </TabPanels>
